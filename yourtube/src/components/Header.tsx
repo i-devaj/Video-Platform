@@ -1,4 +1,4 @@
-import { Bell, Menu, Mic, Search, User, VideoIcon } from "lucide-react";
+import { Bell, Menu, Mic, Moon, Search, Sun, User, VideoIcon } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -14,9 +14,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Channeldialogue from "./channeldialogue";
 import { useRouter } from "next/router";
 import { useUser } from "@/lib/AuthContext";
+import { useTheme } from "next-themes";
 
 const Header = () => {
   const { user, logout, handlegooglesignin } = useUser();
+  const { theme, setTheme } = useTheme();
   // const user: any = {
   //   id: "1",
   //   name: "John Doe",
@@ -38,7 +40,7 @@ const Header = () => {
     }
   };
   return (
-    <header className="flex items-center justify-between px-4 py-2 bg-white border-b">
+    <header className="flex items-center justify-between px-4 py-2 bg-background border-b">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon">
           <Menu className="w-6 h-6" />
@@ -50,7 +52,7 @@ const Header = () => {
             </svg>
           </div>
           <span className="text-xl font-medium">FlexTube</span>
-          <span className="text-xs text-gray-400 ml-1">IN</span>
+          <span className="text-xs text-muted-foreground ml-1">IN</span>
         </Link>
       </div>
       <form
@@ -68,7 +70,7 @@ const Header = () => {
           />
           <Button
             type="submit"
-            className="rounded-r-full px-6 bg-gray-50 hover:bg-gray-100 text-gray-600 border border-l-0"
+            className="rounded-r-full px-6 bg-muted hover:bg-accent text-muted-foreground border border-l-0"
           >
             <Search className="w-5 h-5" />
           </Button>
@@ -123,6 +125,17 @@ const Header = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/watch-later">Watch later</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                >
+                  {theme === "dark" ? (
+                    <Sun className="w-4 h-4 mr-2" />
+                  ) : (
+                    <Moon className="w-4 h-4 mr-2" />
+                  )}
+                  {theme === "dark" ? "Light Mode" : "Dark Mode"}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>Sign out</DropdownMenuItem>
