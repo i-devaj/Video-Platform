@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 
 interface RelatedVideosProps {
@@ -7,11 +6,14 @@ interface RelatedVideosProps {
     _id: string;
     videotitle: string;
     videochanel: string;
+    filepath: string;
     views: number;
     createdAt: string;
   }>;
 }
-const vid = "/video/vdo.mp4";
+const onThumbLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+  e.currentTarget.currentTime = 1;
+};
 export default function RelatedVideos({ videos }: RelatedVideosProps) {
   return (
     <div className="space-y-2">
@@ -23,8 +25,11 @@ export default function RelatedVideos({ videos }: RelatedVideosProps) {
         >
           <div className="relative w-40 aspect-video bg-muted rounded overflow-hidden flex-shrink-0">
             <video
-              src={vid}
-              className="object-cover group-hover:scale-105 transition-transform duration-200"
+              src={`${process.env.BACKEND_URL}/${video.filepath}`}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              onLoadedMetadata={onThumbLoad}
+              preload="metadata"
+              muted
             />
           </div>
           <div className="flex-1 min-w-0">

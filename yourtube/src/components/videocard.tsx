@@ -1,9 +1,13 @@
-"use clinet";
+"use client";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
-const videos = "/video/vdo.mp4";
+const onThumbLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+  const v = e.currentTarget;
+  v.currentTime = 1;
+};
+
 export default function VideoCard({ video }: any) {
   return (
     <Link href={`/watch/${video?._id}`} className="group">
@@ -11,7 +15,10 @@ export default function VideoCard({ video }: any) {
         <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
           <video
             src={`${process.env.BACKEND_URL}/${video?.filepath}`}
-            className="object-cover group-hover:scale-105 transition-transform duration-200"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+            onLoadedMetadata={onThumbLoad}
+            preload="metadata"
+            muted
           />
           <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1 rounded">
             10:24
@@ -36,3 +43,4 @@ export default function VideoCard({ video }: any) {
     </Link>
   );
 }
+

@@ -27,6 +27,7 @@ export const getallhistoryVideo = async (req, res) => {
   try {
     const historyvideo = await history
       .find({ viewer: userId })
+      .sort({ createdAt: -1 })
       .populate({
         path: "videoid",
         model: "videofiles",

@@ -93,7 +93,10 @@ export default function WatchLaterContent() {
               <div className="relative w-40 aspect-video bg-muted rounded overflow-hidden">
                 <video
                   src={`${process.env.BACKEND_URL}/${item.videoid?.filepath}`}
-                  className="object-cover group-hover:scale-105 transition-transform duration-200"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  onLoadedMetadata={(e) => { e.currentTarget.currentTime = 1; }}
+                  preload="metadata"
+                  muted
                 />
               </div>
             </Link>

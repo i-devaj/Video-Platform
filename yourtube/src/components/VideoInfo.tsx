@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
+  Bell,
   Clock,
   Download,
   MoreHorizontal,
@@ -21,6 +22,13 @@ const VideoInfo = ({ video }: any) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const { user } = useUser();
   const [isWatchLater, setIsWatchLater] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subCount, setSubCount] = useState(0);
+  const [subLoading, setSubLoading] = useState(false);
+  // Ref to always hold the latest user value so the tracking effect
+  // can read it without being re-triggered by auth state changes.
+  const userRef = useRef(user);
+  useEffect(() => { userRef.current = user; }, [user]);
 
   // const user: any = {
   //   id: "1",
@@ -35,22 +43,69 @@ const VideoInfo = ({ video }: any) => {
     setIsDisliked(false);
   }, [video]);
 
+  // Check subscription status
   useEffect(() => {
-    const handleviews = async () => {
-      if (user) {
-        try {
-          return await axiosInstance.post(`/history/${video._id}`, {
-            userId: user?._id,
+    if (user && video?.uploader) {
+      axiosInstance
+        .get(`/subscription/check/${user._id}/${video.uploader}`)
+        .then((res) => {
+          setIsSubscribed(res.data.subscribed);
+          setSubCount(res.data.count);
+        })
+        .catch(() => {});
+    } else if (video?.uploader) {
+      axiosInstance
+        .get(`/subscription/count/${video.uploader}`)
+        .then((res) => setSubCount(res.data.count))
+        .catch(() => {});
+    }
+  }, [user, video]);
+
+  const handleSubscribe = async () => {
+    if (!user || !video?.uploader || subLoading) return;
+    setSubLoading(true);
+    try {
+      const res = await axiosInstance.post(
+        `/subscription/${video.uploader}`,
+        { userId: user._id }
+      );
+      setIsSubscribed(res.data.subscribed);
+      setSubCount((prev) => (res.data.subscribed ? prev + 1 : prev - 1));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setSubLoading(false);
+    }
+  };
+
+  const formatCount = (n: number) => {
+    if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+    if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+    return n.toString();
+  };
+
+  // Track view/history ONCE per video. Uses a 600ms delay so that:
+  // 1. StrictMode's unmount→remount clears the first timer (cleanup),
+  //    meaning only the final mount's timer fires → exactly 1 API call.
+  // 2. Firebase auth has time to resolve, so userRef.current is populated
+  //    and we call the correct endpoint (authenticated vs guest).
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const currentUser = userRef.current;
+      try {
+        if (currentUser) {
+          await axiosInstance.post(`/history/${video._id}`, {
+            userId: currentUser._id,
           });
-        } catch (error) {
-          return console.log(error);
+        } else {
+          await axiosInstance.post(`/history/views/${video._id}`);
         }
-      } else {
-        return await axiosInstance.post(`/history/views/${video?._id}`);
+      } catch (error) {
+        console.log(error);
       }
-    };
-    handleviews();
-  }, [user]);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [video._id]);
   const handleLike = async () => {
     if (!user) return;
     try {
@@ -122,9 +177,27 @@ const VideoInfo = ({ video }: any) => {
           </Avatar>
           <div>
             <h3 className="font-medium">{video.videochanel}</h3>
-            <p className="text-sm text-muted-foreground">1.2M subscribers</p>
+            <p className="text-sm text-muted-foreground">{formatCount(subCount)} subscribers</p>
           </div>
-          <Button className="ml-4">Subscribe</Button>
+          {user && user._id !== video?.uploader && (
+            <Button
+              className={`ml-4 gap-2 ${
+                isSubscribed ? "bg-muted" : "bg-red-600 hover:bg-red-700"
+              }`}
+              variant={isSubscribed ? "outline" : "default"}
+              disabled={subLoading}
+              onClick={handleSubscribe}
+            >
+              {isSubscribed ? (
+                <>
+                  <Bell className="w-4 h-4" />
+                  Subscribed
+                </>
+              ) : (
+                "Subscribe"
+              )}
+            </Button>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center bg-muted rounded-full">

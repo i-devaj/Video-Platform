@@ -113,7 +113,7 @@ const SearchResult = ({ query }: any) => {
                   className="flex items-center gap-2 mb-2 hover:text-blue-600"
                 >
                   <Avatar className="w-6h-6">
-                    <AvatarImage src="/placeholder.svg?height=24&width=24" />
+                    <AvatarImage src="" />
                     <AvatarFallback className="text-xs">
                       {video.videochanel[0]}
                     </AvatarFallback>
