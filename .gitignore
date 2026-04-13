@@ -38,7 +38,7 @@ node_modules
 
 #folders
 # Ignore everything in this folder
-/server/upload/*
+server/upload/*
 
 # But do not ignore the .gitkeep file
-!/server/upload/.gitkeep
+!server/upload/.gitkeep
