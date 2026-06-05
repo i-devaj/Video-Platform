@@ -10,7 +10,7 @@ export const uploadvideo = async (req, res) => {
       const file = new video({
         videotitle: req.body.videotitle,
         filename: req.file.originalname,
-        filepath: req.file.path,
+        filepath: req.file.path.replace(/\\/g, "/"),
         filetype: req.file.mimetype,
         filesize: req.file.size,
         videochanel: req.body.videochanel,
@@ -30,6 +30,17 @@ export const getallvideo = async (req, res) => {
     return res.status(200).send(files);
   } catch (error) {
     console.error(" error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const getvideobyuser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const files = await video.find({ uploader: userId }).sort({ createdAt: -1 });
+    return res.status(200).json(files);
+  } catch (error) {
+    console.error("Error fetching user videos:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };

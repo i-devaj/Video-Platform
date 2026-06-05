@@ -1,14 +1,31 @@
 "use client";
+import { useState } from "react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 
-const onThumbLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-  const v = e.currentTarget;
-  v.currentTime = 1;
-};
+function formatDuration(seconds: number): string {
+  if (!seconds || isNaN(seconds)) return "0:00";
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  if (h > 0) {
+    return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  }
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
 
 export default function VideoCard({ video }: any) {
+  const [duration, setDuration] = useState("");
+
+  const onThumbLoad = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const v = e.currentTarget;
+    v.currentTime = 1;
+    if (v.duration && isFinite(v.duration)) {
+      setDuration(formatDuration(v.duration));
+    }
+  };
+
   return (
     <Link href={`/watch/${video?._id}`} className="group">
       <div className="space-y-3">
@@ -20,9 +37,11 @@ export default function VideoCard({ video }: any) {
             preload="metadata"
             muted
           />
-          <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1 rounded">
-            10:24
-          </div>
+          {duration && (
+            <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1 rounded">
+              {duration}
+            </div>
+          )}
         </div>
         <div className="flex gap-3">
           <Avatar className="w-9 h-9 flex-shrink-0">
@@ -43,4 +62,3 @@ export default function VideoCard({ video }: any) {
     </Link>
   );
 }
-
