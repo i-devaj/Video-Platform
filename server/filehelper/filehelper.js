@@ -11,11 +11,18 @@ const storage = multer.diskStorage({
     );
   },
 });
+const ALLOWED_MIMETYPES = [
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",   // .mov
+  "video/x-msvideo",   // .avi
+  "video/avi",
+];
 const filefilter = (req, file, cb) => {
-  if (file.mimetype === "video/mp4") {
+  if (ALLOWED_MIMETYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(null, false);
+    cb(new Error(`Unsupported file type: ${file.mimetype}. Allowed: MP4, WebM, MOV, AVI`), false);
   }
 };
 const upload = multer({ storage: storage, fileFilter: filefilter });
