@@ -9,10 +9,12 @@ import {
   Share,
   ThumbsDown,
   ThumbsUp,
+  Crown,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useUser } from "@/lib/AuthContext";
 import axiosInstance from "@/lib/axiosinstance";
+import PremiumModal from "@/components/PremiumModal";
 
 const VideoInfo = ({ video }: any) => {
   const [likes, setlikes] = useState(video.Like || 0);
@@ -25,6 +27,9 @@ const VideoInfo = ({ video }: any) => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subCount, setSubCount] = useState(0);
   const [subLoading, setSubLoading] = useState(false);
+  const [downloadLimitReached, setDownloadLimitReached] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   // Ref to always hold the latest user value so the tracking effect
   // can read it without being re-triggered by auth state changes.
   const userRef = useRef(user);
@@ -60,6 +65,20 @@ const VideoInfo = ({ video }: any) => {
         .catch(() => {});
     }
   }, [user, video]);
+  useEffect(() => {
+    if (user) {
+      axiosInstance
+        .get(`/download/check/${user._id}`)
+        .then((res) => {
+          if (res.data.isPremium) {
+            setDownloadLimitReached(false);
+          } else {
+            setDownloadLimitReached(res.data.limitReached);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [user]);
 
   const handleSubscribe = async () => {
     if (!user || !video?.uploader || subLoading) return;
@@ -166,6 +185,49 @@ const VideoInfo = ({ video }: any) => {
       console.log(error);
     }
   };
+
+  const handleDownload = async () => {
+    if (!user) {
+      alert("Please sign in to download videos");
+      return;
+    }
+    if (downloadLimitReached) {
+      setShowPremiumModal(true);
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      const res = await axiosInstance.post(`/download/${video._id}`, {
+        userId: user._id,
+      });
+
+      if (res.status === 200) {
+        const fileUrl = `${process.env.NEXT_PUBLIC_BACKEND_URL}/${video.filepath}`;
+        const response = await fetch(fileUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = `${video.videotitle}.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        setDownloadLimitReached(true);
+      }
+    } catch (error: any) {
+      if (error.response?.status === 403) {
+        setDownloadLimitReached(true);
+        alert(error.response.data.message || "Download limit reached.");
+      } else {
+        console.error("Download failed:", error);
+      }
+    } finally {
+      setIsDownloading(false);
+    }
+  };
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">{video.videotitle}</h1>
@@ -252,9 +314,15 @@ const VideoInfo = ({ video }: any) => {
             variant="ghost"
             size="sm"
             className="bg-muted rounded-full"
+            onClick={handleDownload}
+            disabled={isDownloading}
           >
-            <Download className="w-5 h-5 mr-2" />
-            Download
+            {downloadLimitReached && !user?.isPremium ? <Crown className="w-5 h-5 mr-2 text-amber-500" /> : <Download className="w-5 h-5 mr-2" />}
+            {isDownloading
+              ? "Downloading..."
+              : downloadLimitReached && !user?.isPremium
+              ? "Upgrade for more"
+              : "Download"}
           </Button>
           <Button
             variant="ghost"
@@ -285,6 +353,14 @@ const VideoInfo = ({ video }: any) => {
           {showFullDescription ? "Show less" : "Show more"}
         </Button>
       </div>
+      <PremiumModal
+        isOpen={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        onSuccess={() => {
+          setDownloadLimitReached(false);
+          setShowPremiumModal(false);
+        }}
+      />
     </div>
   );
 };

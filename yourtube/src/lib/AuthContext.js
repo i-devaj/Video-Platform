@@ -14,6 +14,16 @@ export const UserProvider = ({ children }) => {
     setUser(userdata);
     localStorage.setItem("user", JSON.stringify(userdata));
   };
+
+  // Fetch populated plan and merge into user object
+  const fetchAndMergePlan = async (userData) => {
+    try {
+      const planRes = await axiosInstance.get(`/plan/user/${userData._id}`);
+      return { ...userData, plan: planRes.data.plan || null };
+    } catch {
+      return { ...userData, plan: null };
+    }
+  };
   const logout = async () => {
     setUser(null);
     localStorage.removeItem("user");
@@ -33,7 +43,8 @@ export const UserProvider = ({ children }) => {
         image: firebaseuser.photoURL || "https://github.com/shadcn.png",
       };
       const response = await axiosInstance.post("/user/login", payload);
-      login(response.data.result);
+      const userWithPlan = await fetchAndMergePlan(response.data.result);
+      login(userWithPlan);
     } catch (error) {
       console.error(error);
     }
@@ -48,7 +59,8 @@ export const UserProvider = ({ children }) => {
             image: firebaseuser.photoURL || "https://github.com/shadcn.png",
           };
           const response = await axiosInstance.post("/user/login", payload);
-          login(response.data.result);
+          const userWithPlan = await fetchAndMergePlan(response.data.result);
+          login(userWithPlan);
         } catch (error) {
           console.error(error);
           logout();

@@ -1,4 +1,4 @@
-import { Bell, Menu, Mic, Moon, Search, Sun, User, VideoIcon } from "lucide-react";
+import { Bell, Menu, Mic, Moon, Search, Sun, User, VideoIcon, Crown } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -15,6 +15,7 @@ import Channeldialogue from "./channeldialogue";
 import { useRouter } from "next/router";
 import { useUser } from "@/lib/AuthContext";
 import { useTheme } from "next-themes";
+import PlanBadge from "./PlanBadge";
 
 const Header = () => {
   const { user, logout, handlegooglesignin } = useUser();
@@ -94,13 +95,32 @@ const Header = () => {
                   variant="ghost"
                   className="relative h-8 w-8 rounded-full"
                 >
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-8 w-8 relative">
                     <AvatarImage src={user.image} />
                     <AvatarFallback>{user.name?.[0] || "U"}</AvatarFallback>
+                    {user?.isPremium && (
+                      <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5">
+                        <Crown className="w-3 h-3 text-amber-500 fill-amber-500" />
+                      </div>
+                    )}
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
+                {user?.isPremium && (
+                  <>
+                    <div className="px-2 py-1.5 flex items-center gap-2 text-sm font-medium text-amber-500 select-none cursor-default">
+                      <Crown className="w-4 h-4 fill-amber-500" />
+                      Premium Member
+                    </div>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <div className="px-2 py-1.5 flex items-center gap-2 select-none cursor-default">
+                  <span className="text-sm text-muted-foreground">Watch plan:</span>
+                  <PlanBadge planName={user?.plan?.name} />
+                </div>
+                <DropdownMenuSeparator />
                 {user?.channelname ? (
                   <DropdownMenuItem asChild>
                     <Link href={`/channel/${user?._id}`}>Your channel</Link>

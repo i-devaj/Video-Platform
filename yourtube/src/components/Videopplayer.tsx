@@ -1,7 +1,9 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
-import { Play, Pause, Maximize, Minimize2, Volume2, VolumeX, Volume1, Settings, PictureInPicture2, Loader2 } from "lucide-react";
+import { Play, Pause, Maximize, Minimize2, Volume2, VolumeX, Volume1, Settings, PictureInPicture2, Loader2, Lock } from "lucide-react";
+import { useWatchTimeGuard } from "@/hooks/useWatchTimeGuard";
+import UpgradeModal from "@/components/UpgradeModal";
 
 interface VideoPlayerProps {
   video: {
@@ -25,6 +27,10 @@ export default function VideoPlayer({
   const videoRef = useRef<HTMLVideoElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Watch time guard — enforces plan-based time limits
+  const { isLimited, showUpgradeModal, setShowUpgradeModal, remainingSeconds, warningVisible } =
+    useWatchTimeGuard({ videoRef });
 
   // Tap detection refs — avoids stale closures in event handlers
   const tapCount = useRef<Record<Zone, number>>({ left: 0, center: 0, right: 0 });
@@ -451,6 +457,28 @@ export default function VideoPlayer({
         ))}
       </div>
 
+      {/* watch time limit overlay */}
+      {isLimited && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center text-white" style={{ zIndex: 30 }}>
+          <Lock className="w-12 h-12 mb-4 text-amber-500" />
+          <h3 className="text-xl font-bold mb-2">Watch time limit reached</h3>
+          <p className="text-sm text-white/70 mb-4">Upgrade your plan to continue watching</p>
+          <button
+            className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors"
+            onClick={() => setShowUpgradeModal(true)}
+          >
+            Upgrade Plan
+          </button>
+        </div>
+      )}
+
+      {/* watch time warning toast */}
+      {warningVisible && remainingSeconds !== null && !isLimited && (
+        <div className="absolute top-4 right-4 bg-amber-500/90 text-white text-sm px-4 py-2 rounded-lg font-medium shadow-lg" style={{ zIndex: 25 }}>
+          ⏱ {remainingSeconds}s remaining on your plan
+        </div>
+      )}
+
       {/* control bar — auto-hides after 3s */}
       <div
         className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8 transition-opacity duration-300 ${
@@ -549,6 +577,12 @@ export default function VideoPlayer({
           </div>
         </div>
       </div>
+
+      {/* upgrade modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+      />
     </div>
   );
 }
