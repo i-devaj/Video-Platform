@@ -36,9 +36,4 @@ yarn-error.log*
 next-env.d.ts
 node_modules
 
-#folders
-# Ignore everything in this folder
-server/upload/*
-
-# But do not ignore the .gitkeep file
-!server/upload/.gitkeep
+# Uploaded files folder is tracked (see server/uploads/.gitkeep)
