@@ -20,19 +20,21 @@ export const login = async (req, res) => {
 };
 export const updateprofile = async (req, res) => {
   const { id: _id } = req.params;
-  const { channelname, description } = req.body;
+  const { channelname, description, phone } = req.body;
   if (!mongoose.Types.ObjectId.isValid(_id)) {
     return res.status(500).json({ message: "User unavailable..." });
   }
   try {
+    const setFields = {
+      channelname: channelname,
+      description: description,
+    };
+    if (phone !== undefined) {
+      setFields.phone = phone;
+    }
     const updatedata = await users.findByIdAndUpdate(
       _id,
-      {
-        $set: {
-          channelname: channelname,
-          description: description,
-        },
-      },
+      { $set: setFields },
       { new: true }
     );
     return res.status(201).json(updatedata);

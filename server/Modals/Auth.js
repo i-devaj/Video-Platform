@@ -6,6 +6,12 @@ const userschema = mongoose.Schema({
   description: { type: String },
   image: { type: String },
   joinedon: { type: Date, default: Date.now },
+  isPremium: { type: Boolean, default: false },
+  premiumSince: { type: Date, default: null },
+  phone: { type: String, default: null },
+  isPhoneVerified: { type: Boolean, default: false },
+  plan: { type: mongoose.Schema.Types.ObjectId, ref: "plan", default: null },
+  planActivatedAt: { type: Date, default: null },
 });
 
 export default mongoose.model("user", userschema);

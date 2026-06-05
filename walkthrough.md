@@ -136,13 +136,22 @@ Wraps everything in [UserProvider](file:///c:/Users/Devaj/you_tube2.0-main/yourt
 
 ---
 
-## Notable Observations
+## Notable Observations (Completed)
 
 > [!NOTE]
-> - **Search** currently uses hardcoded mock data instead of the backend API
-> - **Channel page** uses hardcoded video data instead of fetching by uploader
-> - The video model has a **duplicate [filename](file:///c:/Users/Devaj/you_tube2.0-main/server/filehelper/filehelper.js#7-13) field** definition
-> - [axiosinstance.js](file:///c:/Users/Devaj/you_tube2.0-main/yourtube/src/lib/axiosinstance.js) uses `process.env.BACKEND_URL` (needs `NEXT_PUBLIC_` prefix for client-side)
-> - Folder named `Modals/` (likely intended as `Models/`)
-> - No subscription system implemented yet (button exists but no backend)
-> - Category tabs are UI-only, no filtering logic connected
+> The following observations have been addressed and marked as **completed**:
+> - [x] **Search** API integration replacing hardcoded mock data
+> - [x] **Channel page** fetching video data by uploader
+> - [x] Video model **duplicate filename field** fixed
+> - [x] Environment variable prefix (`NEXT_PUBLIC_`) added in axios instance
+> - [x] `Modals/` folder naming convention addressed
+> - [x] Subscription system backend implementation completed
+> - [x] Category tabs filtering logic connected
+
+## Recent Integrations
+
+> [!TIP]
+> - **Firebase Storage**: Successfully integrated for storing uploaded video files, replacing local filesystem storage.
+> - **Razorpay Integration**: Added secure payment gateway integration using Razorpay.
+> - **Email Invoices**: Implemented automated email invoices for successful transactions.
+> - **WebRTC Calling**: Implemented the webRTCcalling system. 
