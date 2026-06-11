@@ -1,5 +1,5 @@
 import express from "express";
-import { getallvideo, uploadvideo, getvideobyuser } from "../controllers/video.js";
+import { getallvideo, uploadvideo, getvideobyuser, getRecommendations, streamVideo } from "../controllers/video.js";
 import upload from "../filehelper/filehelper.js";
 
 const routes = express.Router();
@@ -24,6 +24,8 @@ routes.post("/upload", async (req, res) => {
   }
 });
 routes.get("/getall", getallvideo);
+routes.get("/recommendations", getRecommendations);
 routes.get("/user/:userId", getvideobyuser);
+routes.get("/stream", streamVideo);
 export default routes;
 

@@ -19,6 +19,21 @@ import { Button } from "@/components/ui/button";
 const ICE_SERVERS = [
   { urls: "stun:stun.l.google.com:19302" },
   { urls: "stun:stun1.l.google.com:19302" },
+  {
+    urls: "turn:openrelay.metered.ca:80",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443?transport=tcp",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  }
 ];
 
 export default function CallRoom() {
@@ -259,9 +274,16 @@ export default function CallRoom() {
       };
 
       // 3. Open WebSocket to signaling server
-      const ws = new WebSocket(
-        `ws://${window.location.hostname}:5000`
-      );
+      // Use NEXT_PUBLIC_BACKEND_URL if available, otherwise fallback to localhost
+      // Need to replace http/https with ws/wss for the WebSocket connection
+      let wsUrl = `ws://${window.location.hostname}:5000`;
+      if (process.env.NEXT_PUBLIC_BACKEND_URL) {
+        wsUrl = process.env.NEXT_PUBLIC_BACKEND_URL.replace(/^http/, "ws");
+      } else if (process.env.BACKEND_URL) {
+        wsUrl = process.env.BACKEND_URL.replace(/^http/, "ws");
+      }
+      
+      const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
       ws.onopen = () => {
@@ -618,7 +640,7 @@ export default function CallRoom() {
   }, [roomId]);
 
   return (
-    <div className="fixed inset-0 bg-[#0f1419] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 w-full h-screen bg-[#0f1419] flex flex-col overflow-hidden">
       {/* ── Status Bar (top) ── */}
       <div className="relative z-20 flex items-center justify-between px-6 py-3">
         <div className="flex items-center gap-3">
@@ -732,7 +754,7 @@ export default function CallRoom() {
           )}
 
           {/* Local Camera (Flexible from PiP size to Sidebar size) */}
-          <div className={`rounded-xl overflow-hidden bg-[#171c22] ring-1 ring-[#414751]/20 relative shadow-[0_10px_40px_rgba(0,0,0,0.4)] transition-all duration-500 ${hasScreenShare ? "w-full aspect-video" : "w-48 h-36"}`}>
+          <div className={`rounded-xl overflow-hidden bg-[#171c22] ring-1 ring-[#414751]/20 relative shadow-[0_10px_40px_rgba(0,0,0,0.4)] transition-all duration-500 ${hasScreenShare ? "w-full aspect-video" : "w-24 h-24 md:w-32 md:h-32"}`}>
             <video
               ref={localVideoRef}
               autoPlay playsInline muted
@@ -752,13 +774,13 @@ export default function CallRoom() {
       </div>
 
       {/* ── Control Bar (bottom) — Glassmorphism ── */}
-      <div className="relative z-20 flex items-center justify-center py-5 px-6">
-        <div className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-[#30353b]/65 backdrop-blur-[20px] shadow-[0_10px_40px_rgba(0,0,0,0.4)]">
+      <div className="relative z-20 flex items-center justify-center py-5 px-6 mb-16 md:mb-20">
+        <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 px-3 md:px-6 py-2 md:py-4 rounded-2xl bg-[#30353b]/65 backdrop-blur-[20px] shadow-[0_10px_40px_rgba(0,0,0,0.4)]">
           {/* Camera toggle */}
           <button
             id="toggle-camera"
             onClick={toggleCamera}
-            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
+            className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
               isCameraOn
                 ? "bg-[#252a30] hover:bg-[#353a40] text-[#dee3eb]"
                 : "bg-red-500/20 hover:bg-red-500/30 text-red-400"
@@ -776,7 +798,7 @@ export default function CallRoom() {
           <button
             id="toggle-mic"
             onClick={toggleMic}
-            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
+            className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
               isMicOn
                 ? "bg-[#252a30] hover:bg-[#353a40] text-[#dee3eb]"
                 : "bg-red-500/20 hover:bg-red-500/30 text-red-400"
@@ -798,7 +820,7 @@ export default function CallRoom() {
             id="toggle-screenshare"
             onClick={toggleScreenShare}
             disabled={!isScreenSharing && isRemoteScreenSharing}
-            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
+            className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
               isScreenSharing
                 ? "bg-[#0067B8]/20 hover:bg-[#0067B8]/30 text-[#a3c9ff]"
                 : !isScreenSharing && isRemoteScreenSharing
@@ -818,7 +840,7 @@ export default function CallRoom() {
           <button
             id="toggle-recording"
             onClick={toggleRecording}
-            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
+            className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
               isRecording
                 ? "bg-red-500/20 hover:bg-red-500/30 text-red-400"
                 : "bg-[#252a30] hover:bg-[#353a40] text-red-400"
@@ -839,7 +861,7 @@ export default function CallRoom() {
           <button
             id="end-call"
             onClick={handleEndCall}
-            className="w-14 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white transition-all duration-200 shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
+            className="w-12 h-10 md:w-14 md:h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white transition-all duration-200 shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
             title="End call"
           >
             <PhoneOff className="w-5 h-5" />

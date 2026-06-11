@@ -40,12 +40,12 @@ export default function CallLobby() {
   const handleCreateRoom = () => {
     // Generate a random 8 character alphanumeric string
     const generatedRoomId = Math.random().toString(36).substring(2, 10);
-    window.open(`/call/${generatedRoomId}`, 'FlexTubeCallWindow');
+    window.open(`/call/${generatedRoomId}`, 'YourtubeCallWindow');
   };
 
   const handleJoinRoom = () => {
     if (roomId.trim() !== "") {
-      window.open(`/call/${roomId.trim()}`, 'FlexTubeCallWindow');
+      window.open(`/call/${roomId.trim()}`, 'YourtubeCallWindow');
     }
   };
 
@@ -63,7 +63,7 @@ export default function CallLobby() {
           <h3 className="text-[#a3c9ff] font-medium text-lg mb-1">Call in Progress</h3>
           <p className="text-sm text-[#8b919d] mb-4">You are currently active in room: <span className="font-mono text-[#dee3eb] bg-[#252a30] px-2 py-0.5 rounded">{activeCallRoomId}</span></p>
           <Button 
-            onClick={() => window.open(`/call/${activeCallRoomId}`, 'FlexTubeCallWindow')}
+            onClick={() => window.open(`/call/${activeCallRoomId}`, 'YourtubeCallWindow')}
             className="w-full bg-[#0067B8]/80 hover:bg-[#0067B8] text-white rounded-xl"
           >
             Return to Call
@@ -81,7 +81,7 @@ export default function CallLobby() {
             <Button
               onClick={handleCreateRoom}
               disabled={!!activeCallRoomId}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 text-md rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white h-10 min-h-0 text-sm md:h-12 md:text-md rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Create new room
             </Button>
@@ -100,7 +100,7 @@ export default function CallLobby() {
                   value={roomId}
                   disabled={!!activeCallRoomId}
                   onChange={(e) => setRoomId(e.target.value)}
-                  className="flex-1 bg-muted/50 border-muted placeholder:text-muted-foreground text-center h-12 rounded-xl text-lg font-mono focus-visible:ring-1 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-muted/50 border-muted placeholder:text-muted-foreground text-center h-10 min-h-0 md:h-12 rounded-xl text-sm md:text-lg font-mono focus-visible:ring-1 focus-visible:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && roomId.trim() && !activeCallRoomId) handleJoinRoom();
                   }}
@@ -109,7 +109,7 @@ export default function CallLobby() {
                   onClick={handleJoinRoom}
                   disabled={!roomId.trim() || !!activeCallRoomId}
                   variant="secondary"
-                  className="h-12 px-8 text-md font-medium rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-10 min-h-0 w-auto min-w-0 px-6 text-sm md:h-12 md:px-8 md:text-md font-medium rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Join room
                 </Button>

@@ -1,4 +1,4 @@
-# Walkthrough — FlexTube Watch-Time Plan System
+# Walkthrough — Yourtube Watch-Time Plan System
 
 ## Summary
 

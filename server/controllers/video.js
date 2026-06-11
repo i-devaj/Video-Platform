@@ -9,50 +9,21 @@ const execFileAsync = promisify(execFile);
 async function convertToMp4(inputPath) {
   const parsed = path.parse(inputPath);
 
-  try {
-    const { stdout } = await execFileAsync("ffprobe", [
-      "-v", "error",
-      "-select_streams", "v:0",
-      "-show_entries", "stream=codec_name",
-      "-of", "default=noprint_wrappers=1:nokey=1",
-      inputPath
-    ]);
-    const codec = stdout.trim().toLowerCase();
-    
-    // If it's already an MP4 container AND has H.264 codec, apply faststart via stream copy
-    if (parsed.ext.toLowerCase() === ".mp4" && codec === "h264") {
-      console.log(`[ffmpeg] Codec is H.264. Applying faststart to ${parsed.base}...`);
-      let outputPath = path.join(parsed.dir, parsed.name + "-faststart.mp4");
-      
-      await execFileAsync("ffmpeg", [
-        "-i", inputPath,
-        "-c", "copy",
-        "-movflags", "+faststart",
-        "-y",
-        outputPath,
-      ]);
-
-      fs.unlinkSync(inputPath);
-      return outputPath;
-    }
-
-    console.log(`[ffmpeg] Codec is '${codec}'. Converting ${parsed.base}...`);
-  } catch (err) {
-    console.warn(`[ffmpeg] Could not probe codec for ${inputPath}, proceeding with conversion.`);
-  }
-
   // If we are re-encoding an mp4, we need a temp name to avoid overwriting the input
   let outputPath = path.join(parsed.dir, parsed.name + ".mp4");
   if (inputPath === outputPath) {
       outputPath = path.join(parsed.dir, parsed.name + "-converted.mp4");
   }
 
+  // Force re-encode to 720p max, lower bitrate (crf 28), and faststart to ensure smooth web playback
   await execFileAsync("ffmpeg", [
     "-i", inputPath,
+    "-vf", "scale='min(1280,iw)':-2", // Scale to 720p max, keeping aspect ratio
     "-c:v", "libx264",
-    "-preset", "fast",
-    "-crf", "23",
+    "-preset", "ultrafast",
+    "-crf", "28",
     "-c:a", "aac",
+    "-b:a", "128k",
     "-movflags", "+faststart",
     "-y",
     outputPath,
@@ -112,5 +83,74 @@ export const getvideobyuser = async (req, res) => {
   } catch (error) {
     console.error("Error fetching user videos:", error);
     return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const getRecommendations = async (req, res) => {
+  try {
+    const files = await video.find();
+    
+    // Get top 10 trending by views
+    const trending = [...files].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 10);
+    
+    // Shuffle all files for random discovery recommendations
+    const recommended = [...files].sort(() => 0.5 - Math.random());
+    
+    return res.status(200).json({
+      trending,
+      recommended
+    });
+  } catch (error) {
+    console.error(" error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const streamVideo = (req, res) => {
+  const filepath = req.query.path;
+  if (!filepath) {
+    return res.status(400).send("Path is required");
+  }
+
+  const absolutePath = path.resolve(filepath);
+
+  // Basic security check
+  if (!absolutePath.includes("uploads")) {
+     return res.status(403).send("Forbidden");
+  }
+
+  if (!fs.existsSync(absolutePath)) {
+    return res.status(404).send("File not found");
+  }
+
+  const stat = fs.statSync(absolutePath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    // 5MB chunk size for smooth playback without buffering
+    const CHUNK_SIZE = 5 * 10 ** 6; 
+    const end = parts[1] ? parseInt(parts[1], 10) : Math.min(start + CHUNK_SIZE, fileSize - 1);
+    
+    const chunksize = (end - start) + 1;
+    const file = fs.createReadStream(absolutePath, { start, end });
+    const head = {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/mp4',
+    };
+
+    res.writeHead(206, head);
+    file.pipe(res);
+  } else {
+    const head = {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+    };
+    res.writeHead(200, head);
+    fs.createReadStream(absolutePath).pipe(res);
   }
 };

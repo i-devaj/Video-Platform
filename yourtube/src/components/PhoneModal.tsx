@@ -48,7 +48,7 @@ export default function PhoneModal({ isOpen, onClose, onSuccess }: PhoneModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent showCloseButton={false}>
+      <DialogContent showCloseButton={false} className="w-[95%] max-w-md md:max-w-lg p-4 md:p-6">
         <DialogHeader>
           <DialogTitle>Add your phone number</DialogTitle>
           <DialogDescription>

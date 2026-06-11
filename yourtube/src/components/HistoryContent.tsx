@@ -84,11 +84,13 @@ export default function HistoryContent() {
         <p className="text-sm text-muted-foreground">{history.length} videos</p>
       </div>
 
-      <div className="space-y-4">
-        {history.map((item) => (
-          <div key={item._id} className="flex gap-4 group">
+      <div className="flex flex-col gap-2 md:gap-4">
+        {history.map((item) => {
+          if (!item.videoid) return null;
+          return (
+          <div key={item._id} className="flex flex-col sm:flex-row gap-4 group relative">
             <Link href={`/watch/${item.videoid._id}`} className="flex-shrink-0">
-              <div className="relative w-40 aspect-video bg-muted rounded overflow-hidden">
+              <div className="relative w-full sm:w-40 md:w-48 aspect-video bg-muted rounded overflow-hidden shrink-0">
                 <video
                   src={`${process.env.BACKEND_URL}/${item.videoid?.filepath}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
@@ -99,16 +101,16 @@ export default function HistoryContent() {
               </div>
             </Link>
 
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pr-8">
               <Link href={`/watch/${item.videoid._id}`}>
-                <h3 className="font-medium text-sm line-clamp-2 group-hover:text-blue-600 mb-1">
+                <h3 className="font-medium text-base md:text-lg line-clamp-2 group-hover:text-blue-600 mb-1">
                   {item.videoid.videotitle}
                 </h3>
               </Link>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {item.videoid.videochanel}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs md:text-sm text-muted-foreground">
                 {item.videoid.views.toLocaleString()} views •{" "}
                 {formatDistanceToNow(new Date(item.videoid.createdAt))} ago
               </p>
@@ -117,7 +119,8 @@ export default function HistoryContent() {
               </p>
             </div>
 
-            <DropdownMenu>
+            <div className="absolute top-2 right-2 sm:relative sm:top-0 sm:right-0">
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -127,7 +130,7 @@ export default function HistoryContent() {
                   <MoreVertical className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="w-56 md:w-64">
                 <DropdownMenuItem
                   onClick={() => handleRemoveFromHistory(item._id)}
                 >
@@ -136,8 +139,10 @@ export default function HistoryContent() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

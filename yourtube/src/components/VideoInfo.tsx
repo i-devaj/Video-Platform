@@ -229,24 +229,27 @@ const VideoInfo = ({ video }: any) => {
     }
   };
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">{video.videotitle}</h1>
+    <div className="space-y-4 md:space-y-6">
+      <h1 className="text-xl md:text-2xl font-semibold">{video.videotitle}</h1>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Avatar className="w-10 h-10">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center justify-between md:justify-start w-full md:w-auto gap-4">
+          <div className="flex items-center gap-3">
+            <Avatar className="w-10 h-10">
             <AvatarFallback>{video.videochanel[0]}</AvatarFallback>
           </Avatar>
           <div>
             <h3 className="font-medium">{video.videochanel}</h3>
             <p className="text-sm text-muted-foreground">{formatCount(subCount)} subscribers</p>
           </div>
+          </div>
           {user && user._id !== video?.uploader && (
             <Button
-              className={`ml-4 gap-2 ${
+              className={`ml-auto md:ml-4 gap-2 w-auto h-9 px-3 md:px-4 text-xs md:text-sm rounded-full ${
                 isSubscribed ? "bg-muted" : "bg-red-600 hover:bg-red-700"
               }`}
               variant={isSubscribed ? "outline" : "default"}
+              size="sm"
               disabled={subLoading}
               onClick={handleSubscribe}
             >
@@ -261,7 +264,7 @@ const VideoInfo = ({ video }: any) => {
             </Button>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 md:flex-nowrap md:gap-4 w-full md:w-auto">
           <div className="flex items-center bg-muted rounded-full">
             <Button
               variant="ghost"
@@ -338,7 +341,7 @@ const VideoInfo = ({ video }: any) => {
           <span>{video.views.toLocaleString()} views</span>
           <span>{formatDistanceToNow(new Date(video.createdAt))} ago</span>
         </div>
-        <div className={`text-sm ${showFullDescription ? "" : "line-clamp-3"}`}>
+        <div className={`text-sm ${showFullDescription ? "" : "line-clamp-3 md:line-clamp-none"}`}>
           <p>
             Sample video description. This would contain the actual video
             description from the database.
@@ -347,7 +350,7 @@ const VideoInfo = ({ video }: any) => {
         <Button
           variant="ghost"
           size="sm"
-          className="mt-2 p-0 h-auto font-medium"
+          className="mt-2 p-0 h-auto font-medium md:hidden"
           onClick={() => setShowFullDescription(!showFullDescription)}
         >
           {showFullDescription ? "Show less" : "Show more"}

@@ -234,9 +234,7 @@ const Comments = ({ videoId }: any) => {
     <div className="space-y-6 relative">
       {/* Toast notification */}
       {toastMsg && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-[slideDown_0.3s_ease-out]"
-          style={{ animation: "slideDown 0.3s ease-out" }}
-        >
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-[slideDown_0.3s_ease-out]">
           <div className="flex items-center gap-3 bg-red-500 text-white px-5 py-3 rounded-lg shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10"/>
@@ -263,7 +261,7 @@ const Comments = ({ videoId }: any) => {
 
       {user && (
         <div className="flex gap-4">
-          <Avatar className="w-10 h-10">
+          <Avatar className="w-8 h-8 md:w-10 md:h-10">
             <AvatarImage src={user.image || ""} />
             <AvatarFallback>{user.name?.[0] || "U"}</AvatarFallback>
           </Avatar>
@@ -292,7 +290,7 @@ const Comments = ({ videoId }: any) => {
           </div>
         </div>
       )}
-      <div className="space-y-4">
+      <div className="flex flex-col gap-2 md:gap-3">
         {comments.length === 0 ? (
           <p className="text-sm text-muted-foreground italic">
             No comments yet. Be the first to comment!
@@ -300,21 +298,21 @@ const Comments = ({ videoId }: any) => {
         ) : (
           comments.map((comment) => (
             <div key={comment._id} className="flex gap-4">
-              <Avatar className="w-10 h-10">
+              <Avatar className="w-8 h-8 md:w-10 md:h-10">
                 <AvatarImage src="" />
                 <AvatarFallback>{comment.usercommented[0]}</AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-sm">
+                  <span className="font-medium text-xs md:text-sm">
                     {comment.usercommented}
                   </span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs md:text-sm text-muted-foreground">
                     {formatDistanceToNow(new Date(comment.commentedon))} ago
                   </span>
                 </div>
                 {comment.city && (
-                  <p className="text-xs text-muted-foreground -mt-0.5 mb-1">
+                  <p className="text-xs md:text-sm text-muted-foreground -mt-0.5 mb-1">
                     {comment.city}
                   </p>
                 )}
@@ -354,7 +352,7 @@ const Comments = ({ videoId }: any) => {
                       if (translated) {
                         return (
                           <div>
-                            <p className="text-sm">{translated}</p>
+                            <p className="text-sm md:text-base">{translated}</p>
                             <button
                               className="text-xs text-blue-500 hover:underline mt-1"
                               onClick={() => setTranslations((prev) => {
@@ -368,7 +366,7 @@ const Comments = ({ videoId }: any) => {
                           </div>
                         );
                       }
-                      return <p className="text-sm">{comment.commentbody}</p>;
+                      return <p className="text-sm md:text-base">{comment.commentbody}</p>;
                     })()}
                     {comment.language && comment.language !== "en" && (
                       (() => {
@@ -418,14 +416,14 @@ const Comments = ({ videoId }: any) => {
                         );
                       })()
                     )}
-                    <div className="flex items-center gap-4 mt-2">
+                    <div className="flex items-center gap-2 md:gap-4 mt-2">
                       <button
                         className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
                         disabled={!user}
                         onClick={() => handleLikeComment(comment._id)}
                       >
                         <ThumbsUp
-                          className={`w-4 h-4 ${
+                          className={`w-4 h-4 md:w-5 md:h-5 ${
                             user && comment.likes?.includes(user._id)
                               ? "fill-current"
                               : ""
@@ -439,7 +437,7 @@ const Comments = ({ videoId }: any) => {
                         onClick={() => handleDislikeComment(comment._id)}
                       >
                         <ThumbsDown
-                          className={`w-4 h-4 ${
+                          className={`w-4 h-4 md:w-5 md:h-5 ${
                             user && comment.dislikes?.includes(user._id)
                               ? "fill-current"
                               : ""
@@ -449,7 +447,7 @@ const Comments = ({ videoId }: any) => {
                       </button>
                     </div>
                     {comment.userid === user?._id && (
-                      <div className="flex gap-2 mt-2 text-sm text-muted-foreground">
+                      <div className="flex gap-2 md:gap-4 mt-2 text-xs md:text-sm text-muted-foreground">
                         <button onClick={() => handleEdit(comment)}>
                           Edit
                         </button>

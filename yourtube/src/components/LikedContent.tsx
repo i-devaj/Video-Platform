@@ -81,7 +81,7 @@ export default function LikedVideosContent() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <p className="text-sm text-muted-foreground">{likedVideos.length} videos</p>
-        <Button className="flex items-center gap-2">
+        <Button className="flex items-center gap-2 w-auto h-8 md:h-10 min-h-0 text-xs md:text-sm px-3 md:px-4">
           <Play className="w-4 h-4" />
           Play all
         </Button>
@@ -125,7 +125,7 @@ export default function LikedVideosContent() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="opacity-0 group-hover:opacity-100"
+                  className="opacity-0 group-hover:opacity-100 min-h-0 w-8 h-8 md:w-9 md:h-9"
                 >
                   <MoreVertical className="w-4 h-4" />
                 </Button>

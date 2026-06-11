@@ -76,7 +76,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, onSuccess 
         amount: data.order.amount,
         currency: "INR",
         order_id: data.order.id,
-        name: "FlexTube",
+        name: "Yourtube",
         description: `Upgrade to ${plan.displayName}`,
         prefill: {
           name: user.name || "User",
@@ -131,7 +131,7 @@ const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, onSuccess 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl bg-background border-muted p-6">
+      <DialogContent className="w-[95%] max-w-md lg:max-w-2xl p-4 md:p-6 bg-background border-muted">
         <DialogHeader className="text-center">
           <div className="flex justify-center mb-3">
             <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">

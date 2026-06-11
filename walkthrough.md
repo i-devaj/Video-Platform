@@ -1,7 +1,7 @@
-# FlexTube (you_tube2.0) — Codebase Walkthrough
+# Yourtube (you_tube2.0) — Codebase Walkthrough
 
 ## Overview
-A **YouTube clone** called **FlexTube** — a full-stack video platform built as a monorepo with a **Node.js/Express backend** and a **Next.js frontend**.
+A **YouTube clone** called **Yourtube** — a full-stack video platform built as a monorepo with a **Node.js/Express backend** and a **Next.js frontend**.
 
 ## Architecture
 

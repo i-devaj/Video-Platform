@@ -60,7 +60,7 @@ const PremiumModal: React.FC<PremiumModalProps> = ({ isOpen, onClose, onSuccess 
         amount: order.amount,
         currency: "INR",
         order_id: order.id,
-        name: "FlexTube Premium",
+        name: "Yourtube Premium",
         description: "Unlimited video downloads",
         prefill: {
           name: user.name || "User",
@@ -108,7 +108,7 @@ const PremiumModal: React.FC<PremiumModalProps> = ({ isOpen, onClose, onSuccess 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-background border-muted flex flex-col items-center text-center p-8">
+      <DialogContent className="w-[95%] max-w-md md:max-w-lg p-4 md:p-6 bg-background border-muted flex flex-col items-center text-center">
         <DialogHeader className="flex flex-col items-center">
           <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mb-4">
             <Crown className="w-8 h-8 text-amber-500" />

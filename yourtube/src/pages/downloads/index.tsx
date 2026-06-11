@@ -92,7 +92,7 @@ export default function DownloadsPage() {
                 id="cancel-subscription-btn"
                 variant="destructive"
                 size="sm"
-                className="ml-2 gap-1.5"
+                className="ml-2 gap-1.5 h-8 min-h-0 w-auto min-w-0 px-2 text-xs md:h-9 md:px-3 md:text-sm"
                 onClick={handleCancelSubscription}
                 disabled={cancelling}
               >
@@ -119,11 +119,11 @@ export default function DownloadsPage() {
         </div>
       ) : (
         <div className="space-y-6">
-          <div className="grid gap-6">
+          <div className="flex flex-col gap-2 md:gap-4">
             {downloads.map((item) => (
               <div key={item._id} className="flex flex-col sm:flex-row gap-5 group relative p-3 hover:bg-muted/50 rounded-2xl transition-all duration-300">
                 <Link href={`/watch/${item.videoid._id}`} className="shrink-0">
-                  <div className="relative aspect-video w-full sm:w-64 bg-black rounded-xl overflow-hidden ring-1 ring-white/10 shadow-lg">
+                  <div className="relative aspect-video w-full sm:w-40 md:w-48 bg-black rounded-xl overflow-hidden ring-1 ring-white/10 shadow-lg shrink-0">
                     <video
                       src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/${item.videoid.filepath}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

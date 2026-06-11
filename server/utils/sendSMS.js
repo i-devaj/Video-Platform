@@ -7,7 +7,7 @@ const client = twilio(
 
 export const sendOTPSMS = async (toPhone, otp) => {
   await client.messages.create({
-    body: `Your FlexTube login OTP is ${otp}. It expires in 5 minutes.`,
+    body: `Your Yourtube login OTP is ${otp}. It expires in 5 minutes.`,
     from: process.env.TWILIO_FROM_NUMBER,
     to: toPhone,
   });

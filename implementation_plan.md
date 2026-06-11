@@ -1,4 +1,4 @@
-# FlexTube Video Watch-Time Plan System — Architecture & Implementation Plan
+# Yourtube Video Watch-Time Plan System — Architecture & Implementation Plan
 
 > [!IMPORTANT]
 > **Scope boundary**: This system ONLY controls video playback time limits. The existing download premium (`isPremium`, `PremiumModal`, download limits) is a **completely separate** system and will NOT be modified.
@@ -190,7 +190,7 @@ sequenceDiagram
 export const sendInvoiceEmail = async (toEmail, data) => {
   // data: { userName, planName, amount, transactionId, invoiceNumber, date }
   const html = `
-    <h2>FlexTube — Plan Upgrade Confirmation</h2>
+    <h2>Yourtube — Plan Upgrade Confirmation</h2>
     <p>Hi ${data.userName},</p>
     <p>Your plan has been upgraded to <strong>${data.planName}</strong>.</p>
     <table>
@@ -200,7 +200,7 @@ export const sendInvoiceEmail = async (toEmail, data) => {
       <tr><td>Date</td><td>${data.date}</td></tr>
     </table>
   `;
-  await transporter.sendMail({ from: process.env.EMAIL_USER, to: toEmail, subject: 'FlexTube Plan Upgrade', html });
+  await transporter.sendMail({ from: process.env.EMAIL_USER, to: toEmail, subject: 'Yourtube Plan Upgrade', html });
 };
 ```
 

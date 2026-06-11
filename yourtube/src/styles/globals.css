@@ -122,7 +122,20 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    @apply scroll-smooth;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
+  }
+  /* Ensure all images are responsive */
+  img {
+    @apply max-w-full h-auto;
+  }
+  /* Touch-friendly button sizes on mobile */
+  @media (max-width: 640px) {
+    button {
+      @apply min-h-10;
+    }
   }
 }

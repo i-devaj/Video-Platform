@@ -62,11 +62,11 @@ const SearchResult = ({ query }: any) => {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
+      <div className="flex flex-col gap-2 md:gap-4">
         {results.map((video: any) => (
-          <div key={video._id} className="flex gap-4 group">
+          <div key={video._id} className="flex flex-col sm:flex-row gap-4 group">
             <Link href={`/watch/${video._id}`} className="flex-shrink-0">
-              <div className="relative w-80 aspect-video bg-muted rounded-lg overflow-hidden">
+              <div className="relative w-full sm:w-40 md:w-48 aspect-video bg-muted rounded-lg overflow-hidden shrink-0">
                 <video
                   src={`${process.env.BACKEND_URL}/${video.filepath}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
@@ -81,12 +81,12 @@ const SearchResult = ({ query }: any) => {
 
             <div className="flex-1 min-w-0 py-1">
               <Link href={`/watch/${video._id}`}>
-                <h3 className="font-medium text-lg line-clamp-2 group-hover:text-blue-600 mb-2">
+                <h3 className="font-medium text-base md:text-lg line-clamp-2 group-hover:text-blue-600 mb-2">
                   {video.videotitle}
                 </h3>
               </Link>
 
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+              <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground mb-2">
                 <span>{video.views?.toLocaleString() || 0} views</span>
                 <span>•</span>
                 <span>
@@ -103,7 +103,7 @@ const SearchResult = ({ query }: any) => {
                     {video.videochanel?.[0] || "?"}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-xs md:text-sm text-muted-foreground">
                   {video.videochanel}
                 </span>
               </Link>

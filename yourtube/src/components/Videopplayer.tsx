@@ -98,7 +98,7 @@ export default function VideoPlayer({
         }
       } else if (zone === "center") {
         if (count === 1) {
-          if (vid.paused) { vid.play(); addToast(x, y, "Playing"); }
+          if (vid.paused) { vid.play().catch(() => {}); addToast(x, y, "Playing"); }
           else { vid.pause(); addToast(x, y, "Paused"); }
         } else if (count >= 3) {
           addToast(x, y, "Next video");
@@ -300,7 +300,7 @@ export default function VideoPlayer({
         case " ":
         case "k":
           e.preventDefault();
-          v.paused ? v.play() : v.pause();
+          v.paused ? v.play().catch(() => {}) : v.pause();
           break;
         case "arrowleft":
           e.preventDefault();
@@ -384,7 +384,7 @@ export default function VideoPlayer({
   return (
     <div
       ref={containerRef}
-      className={`relative aspect-video bg-black rounded-lg overflow-hidden ${
+      className={`relative w-full aspect-video bg-black rounded-lg overflow-hidden ${
         controlsVisible ? "cursor-default" : "cursor-none"
       }`}
       tabIndex={0}
@@ -408,12 +408,12 @@ export default function VideoPlayer({
       <video
         ref={videoRef}
         className="w-full h-full pointer-events-none"
-        src={`${process.env.BACKEND_URL}/${video?.filepath}`}
+        src={`${process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL}/video/stream?path=${encodeURIComponent(video?.filepath || '')}`}
         preload="metadata"
       />
 
       {/* gesture overlay — 3 equal vertical zones */}
-      <div ref={overlayRef} className="absolute inset-0" style={{ zIndex: 10, pointerEvents: "all" }}>
+      <div ref={overlayRef} className="absolute inset-0 z-10 pointer-events-auto">
         {ZONES.map((zone, i) => (
           <div
             key={zone}
@@ -459,7 +459,7 @@ export default function VideoPlayer({
 
       {/* watch time limit overlay */}
       {isLimited && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center text-white" style={{ zIndex: 30 }}>
+        <div className="absolute inset-0 z-30 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center text-white">
           <Lock className="w-12 h-12 mb-4 text-amber-500" />
           <h3 className="text-xl font-bold mb-2">Watch time limit reached</h3>
           <p className="text-sm text-white/70 mb-4">Upgrade your plan to continue watching</p>
@@ -474,21 +474,19 @@ export default function VideoPlayer({
 
       {/* watch time warning toast */}
       {warningVisible && remainingSeconds !== null && !isLimited && (
-        <div className="absolute top-4 right-4 bg-amber-500/90 text-white text-sm px-4 py-2 rounded-lg font-medium shadow-lg" style={{ zIndex: 25 }}>
+        <div className="absolute top-4 right-4 z-20 bg-amber-500/90 text-white text-sm px-4 py-2 rounded-lg font-medium shadow-lg">
           ⏱ {remainingSeconds}s remaining on your plan
         </div>
       )}
 
-      {/* control bar — auto-hides after 3s */}
       <div
-        className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3 pt-8 transition-opacity duration-300 ${
-          controlsVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent p-2 pt-6 md:p-3 md:pt-8 transition-opacity duration-300 ${
+          controlsVisible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
-        style={{ zIndex: 20, pointerEvents: controlsVisible ? "all" : "none" }}
       >
         {/* progress bar */}
         <div
-          className="w-full h-1 bg-white/30 rounded-full cursor-pointer mb-2 hover:h-1.5 transition-all"
+          className="w-full h-1 md:h-2 bg-white/30 rounded-full cursor-pointer mb-2 hover:h-1.5 md:hover:h-2.5 transition-all"
           onClick={seekTo}
         >
           <div
@@ -501,14 +499,14 @@ export default function VideoPlayer({
 
         {/* buttons row */}
         <div className="flex items-center justify-between text-white">
-          <div className="flex items-center gap-3">
-            <button className="hover:opacity-80 transition-opacity" onClick={() => { const v = videoRef.current; if (v) v.paused ? v.play() : v.pause(); }}>
+          <div className="flex items-center gap-1 md:gap-3">
+            <button className="p-2 md:p-3 min-h-12 min-w-12 md:min-h-0 md:min-w-0 flex items-center justify-center hover:opacity-80 transition-opacity" onClick={() => { const v = videoRef.current; if (v) v.paused ? v.play().catch(() => {}) : v.pause(); }}>
               {playing ? <Pause className="w-5 h-5 fill-white" /> : <Play className="w-5 h-5 fill-white" />}
             </button>
 
             {/* volume control */}
             <div className="flex items-center gap-1.5 group/vol">
-              <button className="hover:opacity-80 transition-opacity" onClick={toggleMute}>
+              <button className="p-2 md:p-3 min-h-12 min-w-12 md:min-h-0 md:min-w-0 flex items-center justify-center hover:opacity-80 transition-opacity" onClick={toggleMute}>
                 <VolumeIcon className="w-5 h-5" />
               </button>
               <div className="w-0 overflow-hidden group-hover/vol:w-20 transition-all duration-200">
@@ -528,16 +526,16 @@ export default function VideoPlayer({
               </div>
             </div>
 
-            <span className="text-xs">{fmt(time)} / {fmt(dur)}</span>
+            <span className="text-xs md:text-sm lg:text-base px-2">{fmt(time)} / {fmt(dur)}</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 md:gap-3">
             {/* speed selector */}
             <div className="relative">
               <button
-                className="hover:opacity-80 transition-opacity flex items-center gap-1 text-xs"
+                className="p-2 md:p-3 min-h-12 min-w-12 md:min-h-0 md:min-w-0 flex items-center justify-center hover:opacity-80 transition-opacity text-xs md:text-sm lg:text-base gap-1"
                 onClick={() => setShowSpeedMenu((p) => !p)}
               >
-                <Settings className="w-4 h-4" />
+                <Settings className="w-4 h-4 md:w-5 md:h-5" />
                 {speed !== 1 && <span>{speed}×</span>}
               </button>
               {showSpeedMenu && (
@@ -557,14 +555,14 @@ export default function VideoPlayer({
               )}
             </div>
             <button
-              className="hover:opacity-80 transition-opacity"
+              className="p-2 md:p-3 min-h-12 min-w-12 md:min-h-0 md:min-w-0 flex items-center justify-center hover:opacity-80 transition-opacity"
               title="Picture-in-Picture (P)"
               onClick={togglePiP}
             >
               <PictureInPicture2 className="w-5 h-5" />
             </button>
             <button
-              className="hover:opacity-80 transition-opacity"
+              className="p-2 md:p-3 min-h-12 min-w-12 md:min-h-0 md:min-w-0 flex items-center justify-center hover:opacity-80 transition-opacity"
               title="Fullscreen (F)"
               onClick={() => {
                 const el = containerRef.current;

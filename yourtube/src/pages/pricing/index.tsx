@@ -61,7 +61,7 @@ export default function PricingPage() {
         amount: data.order.amount,
         currency: "INR",
         order_id: data.order.id,
-        name: "FlexTube",
+        name: "Yourtube",
         description: `Upgrade to ${plan.displayName}`,
         prefill: { name: user.name || "User", email: user.email || "" },
         handler: async (response: any) => {
@@ -120,7 +120,7 @@ export default function PricingPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 mb-4">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight mb-3">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight mb-3">
             Choose Your Plan
           </h1>
           <p className="text-lg text-muted-foreground max-w-md mx-auto">
@@ -129,7 +129,7 @@ export default function PricingPage() {
         </div>
 
         {/* Plan cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {plans.map((plan) => {
             const color = PLAN_COLORS[plan.name] || "#6b7280";
             const isCurrent =
@@ -142,7 +142,7 @@ export default function PricingPage() {
             return (
               <div
                 key={plan._id}
-                className={`relative rounded-2xl border-2 p-6 flex flex-col transition-all duration-300 hover:shadow-xl ${
+                className={`relative h-full min-h-full rounded-2xl border-2 p-6 flex flex-col transition-all duration-300 hover:shadow-xl ${
                   isCurrent
                     ? "border-2 shadow-lg"
                     : "border-muted hover:border-muted-foreground/30"
@@ -180,7 +180,7 @@ export default function PricingPage() {
                   >
                     {PLAN_ICONS[plan.name] || PLAN_ICONS.free}
                   </div>
-                  <h3 className="text-xl font-bold" style={{ color }}>
+                  <h3 className="text-lg md:text-xl lg:text-2xl font-bold" style={{ color }}>
                     {plan.displayName}
                   </h3>
                 </div>
@@ -188,9 +188,9 @@ export default function PricingPage() {
                 {/* Price */}
                 <div className="mb-4">
                   {plan.price === 0 ? (
-                    <div className="text-3xl font-bold">Free</div>
+                    <div className="text-2xl md:text-4xl font-bold">Free</div>
                   ) : (
-                    <div className="text-3xl font-bold">
+                    <div className="text-2xl md:text-4xl font-bold">
                       {formatPrice(plan.price)}
                       <span className="text-sm font-normal text-muted-foreground ml-1">
                         one-time

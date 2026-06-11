@@ -68,7 +68,7 @@ export default function SubscriptionContent() {
           Don&apos;t miss new videos
         </h2>
         <p className="text-muted-foreground text-center max-w-md mb-6">
-          Sign in to see updates from your favorite FlexTube channels.
+          Sign in to see updates from your favorite Yourtube channels.
         </p>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Bell className="w-4 h-4" />

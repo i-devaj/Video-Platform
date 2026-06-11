@@ -13,6 +13,7 @@ interface OTPModalProps {
   isOpen: boolean;
   identifier: string;
   type: "email" | "sms";
+  initialTestOtp?: string;
   onVerified: () => void;
   onClose: () => void;
 }
@@ -21,6 +22,7 @@ export default function OTPModal({
   isOpen,
   identifier,
   type,
+  initialTestOtp,
   onVerified,
   onClose,
 }: OTPModalProps) {
@@ -29,6 +31,14 @@ export default function OTPModal({
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(30);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (isOpen && initialTestOtp) {
+      setTimeout(() => {
+        alert(`TEST DEMO: Your generated OTP is ${initialTestOtp}. It is for test purposes.`);
+      }, 500);
+    }
+  }, [isOpen, initialTestOtp]);
 
   // Start countdown when modal opens
   useEffect(() => {
@@ -81,12 +91,15 @@ export default function OTPModal({
   const handleResend = async () => {
     setError("");
     try {
-      await axiosInstance.post("/otp/send", {
+      const res = await axiosInstance.post("/otp/send", {
         email: identifier,
         phone: identifier,
-        type,
+        type: type === "sms" ? "phone" : "email",
       });
       setCountdown(30);
+      if (res.data.testOtp) {
+        alert(`TEST DEMO: Your generated OTP is ${res.data.testOtp}. It is for test purposes.`);
+      }
     } catch {
       setError("Failed to resend OTP. Please try again.");
     }
@@ -94,7 +107,7 @@ export default function OTPModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent showCloseButton={false}>
+      <DialogContent showCloseButton={false} className="w-[95%] max-w-md md:max-w-lg p-4 md:p-6">
         <DialogHeader>
           <DialogTitle>Verify your identity</DialogTitle>
           <DialogDescription>

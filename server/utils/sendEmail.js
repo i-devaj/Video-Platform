@@ -21,13 +21,19 @@ function ensureTransporter() {
 }
 
 export const sendOTPEmail = async (toEmail, otp) => {
-  if (!ensureTransporter()) return;
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: toEmail,
-    subject: 'FlexTube Login OTP',
-    html: `<p>Your FlexTube login OTP is <strong>${otp}</strong>. It expires in 5 minutes.</p>`,
-  });
+  if (!ensureTransporter()) return false;
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: toEmail,
+      subject: 'Yourtube Login OTP',
+      html: `<p>Your Yourtube login OTP is <strong>${otp}</strong>. It expires in 5 minutes.</p>`,
+    });
+    return true;
+  } catch (error) {
+    console.error('Email failed to send:', error);
+    return false;
+  }
 };
 
 export const sendInvoiceEmail = async (toEmail, data) => {
@@ -36,10 +42,10 @@ export const sendInvoiceEmail = async (toEmail, data) => {
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: toEmail,
-    subject: `FlexTube — ${planName} Upgrade Confirmation`,
+    subject: `Yourtube — ${planName} Upgrade Confirmation`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 24px;">
-        <h2 style="color: #1a1a1a; margin-bottom: 8px;">FlexTube Plan Upgrade</h2>
+        <h2 style="color: #1a1a1a; margin-bottom: 8px;">Yourtube Plan Upgrade</h2>
         <p style="color: #555;">Hi ${userName},</p>
         <p style="color: #555;">Your plan has been upgraded to <strong>${planName}</strong>. Here are your invoice details:</p>
         <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">

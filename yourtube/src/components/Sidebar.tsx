@@ -15,27 +15,54 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import Channeldialogue from "./channeldialogue";
 import { useUser } from "@/lib/AuthContext";
+import { useSidebar } from "@/lib/SidebarContext";
+import { X } from "lucide-react";
 
 const Sidebar = () => {
   const { user } = useUser();
-
+  const { isMobileOpen, closeMobile } = useSidebar();
   const [isdialogeopen, setisdialogeopen] = useState(false);
+
   return (
-    <aside className="w-64 bg-background border-r min-h-screen p-2">
-      <nav className="space-y-1">
-        <Link href="/">
+    <>
+      {/* Mobile Backdrop */}
+      {isMobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden" 
+          onClick={closeMobile}
+        />
+      )}
+      
+      {/* Sidebar Container */}
+      <aside 
+        className={`
+          fixed inset-y-0 left-0 z-40 bg-background border-r
+          w-64 transform transition-transform duration-300 ease-in-out
+          md:relative md:translate-x-0 md:flex md:flex-col md:flex-shrink-0
+          ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        <div className="flex items-center justify-between p-4 md:hidden border-b">
+          <span className="font-medium text-lg">Menu</span>
+          <Button variant="ghost" size="icon" onClick={closeMobile}>
+            <X className="w-5 h-5" />
+          </Button>
+        </div>
+        
+        <nav className="space-y-2 p-2 overflow-y-auto flex-1">
+        <Link href="/" className="block" onClick={closeMobile}>
           <Button variant="ghost" className="w-full justify-start">
             <Home className="w-5 h-5 mr-3" />
             Home
           </Button>
         </Link>
-        <Link href="/explore">
+        <Link href="/explore" className="block" onClick={closeMobile}>
           <Button variant="ghost" className="w-full justify-start">
             <Compass className="w-5 h-5 mr-3" />
             Explore
           </Button>
         </Link>
-        <Link href="/subscriptions">
+        <Link href="/subscriptions" className="block" onClick={closeMobile}>
           <Button variant="ghost" className="w-full justify-start">
             <PlaySquare className="w-5 h-5 mr-3" />
             Subscriptions
@@ -44,45 +71,45 @@ const Sidebar = () => {
 
         {user && (
           <>
-            <div className="border-t pt-2 mt-2">
-              <Link href="/call">
+            <div className="border-t pt-3 mt-3 space-y-2">
+              <Link href="/call" className="block" onClick={closeMobile}>
                 <Button variant="ghost" className="w-full justify-start">
                   <Video className="w-5 h-5 mr-3" />
                   Video call
                 </Button>
               </Link>
-              <Link href="/history">
+              <Link href="/history" className="block" onClick={closeMobile}>
                 <Button variant="ghost" className="w-full justify-start">
                   <History className="w-5 h-5 mr-3" />
                   History
                 </Button>
               </Link>
-              <Link href="/liked">
+              <Link href="/liked" className="block" onClick={closeMobile}>
                 <Button variant="ghost" className="w-full justify-start">
                   <ThumbsUp className="w-5 h-5 mr-3" />
                   Liked videos
                 </Button>
               </Link>
-              <Link href="/watch-later">
+              <Link href="/watch-later" className="block" onClick={closeMobile}>
                 <Button variant="ghost" className="w-full justify-start">
                   <Clock className="w-5 h-5 mr-3" />
                   Watch later
                 </Button>
               </Link>
-              <Link href="/downloads">
+              <Link href="/downloads" className="block" onClick={closeMobile}>
                 <Button variant="ghost" className="w-full justify-start">
                   <Download className="w-5 h-5 mr-3" />
                   Downloads
                 </Button>
               </Link>
-              <Link href="/pricing">
+              <Link href="/pricing" className="block" onClick={closeMobile}>
                 <Button variant="ghost" className="w-full justify-start">
                   <Sparkles className="w-5 h-5 mr-3 text-amber-500" />
                   Plans & Pricing
                 </Button>
               </Link>
               {user?.channelname ? (
-                <Link href={`/channel/${user.id}`}>
+                <Link href={`/channel/${user?._id}`} className="block" onClick={closeMobile}>
                   <Button variant="ghost" className="w-full justify-start">
                     <User className="w-5 h-5 mr-3" />
                     Your channel
@@ -110,6 +137,7 @@ const Sidebar = () => {
         mode="create"
       />
     </aside>
+    </>
   );
 };
 

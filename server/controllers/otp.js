@@ -15,13 +15,24 @@ export const sendotp = async (req, res) => {
     await otp.create({ identifier, otp: code, type });
 
     // Send via the appropriate channel
+    let testOtp = undefined;
     if (type === 'email') {
-      await sendOTPEmail(identifier, code);
+      const emailSent = await sendOTPEmail(identifier, code);
+      if (!emailSent) {
+        testOtp = code; // Fallback to test demo popup if env is not configured
+      }
     } else {
-      await sendOTPSMS(identifier, code);
+      // For phone, we use a test demo approach where the OTP is shown as a popup
+      testOtp = code;
+      // We can also attempt to send SMS but it's optional now
+      try {
+        await sendOTPSMS(identifier, code);
+      } catch (err) {
+        console.warn('SMS failed, continuing with test OTP popup', err);
+      }
     }
 
-    res.status(200).json({ success: true, message: 'OTP sent' });
+    res.status(200).json({ success: true, message: 'OTP sent', testOtp });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
