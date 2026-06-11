@@ -105,12 +105,18 @@ export default function CallRoom() {
     
     // Explicitly re-hydrate the main Stage if Local User is sharing
     if (hasScreenShare && isScreenSharing && mainScreenVideoRef.current && screenStreamRef.current) {
-      mainScreenVideoRef.current.srcObject = screenStreamRef.current;
+      if (mainScreenVideoRef.current.srcObject !== screenStreamRef.current) {
+        mainScreenVideoRef.current.srcObject = screenStreamRef.current;
+      }
+      mainScreenVideoRef.current.play().catch(() => {});
     }
     
     // Explicitly re-hydrate the main Stage if Remote User is sharing
     if (hasScreenShare && isRemoteScreenSharing && mainScreenVideoRef.current && remoteScreenStreamRef.current) {
-      mainScreenVideoRef.current.srcObject = remoteScreenStreamRef.current;
+      if (mainScreenVideoRef.current.srcObject !== remoteScreenStreamRef.current) {
+        mainScreenVideoRef.current.srcObject = remoteScreenStreamRef.current;
+      }
+      mainScreenVideoRef.current.play().catch(() => {});
     }
   }, [hasScreenShare, isScreenSharing, isRemoteScreenSharing, isRemoteCameraOn]);
 
@@ -260,7 +266,10 @@ export default function CallRoom() {
            } else if (remoteVideoCount === 2) {
              const scrStream = event.streams[0] || new MediaStream([event.track]);
              remoteScreenStreamRef.current = scrStream;
-             if (mainScreenVideoRef.current) mainScreenVideoRef.current.srcObject = scrStream;
+             if (mainScreenVideoRef.current) {
+               mainScreenVideoRef.current.srcObject = scrStream;
+               mainScreenVideoRef.current.play().catch(() => {});
+             }
            }
         } else if (event.track.kind === "audio") {
           console.log("Remote audio track received");
